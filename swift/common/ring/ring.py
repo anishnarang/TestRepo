@@ -234,6 +234,7 @@ class Ring(object):
         """
         return getmtime(self.serialized_path) != self._mtime
 
+ 
     def _get_part_nodes(self, part):
         part_nodes = []
         seen_ids = set()
@@ -243,6 +244,29 @@ class Ring(object):
                 if dev_id not in seen_ids:
                     part_nodes.append(self.devs[dev_id])
                     seen_ids.add(dev_id)
+        ### Changes ###
+        # try:
+        #     dict_info = pickle.load(open("/home/hduser/devices.p","r"))
+        #     replica_info=pickle.load(open("/home/hduser/replicas.p","r"))
+        # except Exception, e:
+        #     dict_info = dict()
+        #     replica_info=dict()
+        # finally:
+        #     pass
+
+        # replica_info[part] = self._replica2part2dev_id[1:]
+        # pickle.dump(replica_info,open("/home/hduser/replicas.p","w"))
+
+        # self._replica2part2dev_id = self._replica2part2dev_id[:1]
+        # # self.replica_count = 1
+        # new_part_nodes = []
+        # new_part_nodes.append(part_nodes[0])
+        # # new_part_nodes.append(part_nodes[1])
+       
+        # dict_info[part] = part_nodes[1:2]
+        # pickle.dump(dict_info,open("/home/hduser/devices.p","w"))
+
+        # print("part_nodes:",part_nodes) # Part nodes is a list of dictionaries.
         return part_nodes
 
     def get_part(self, account, container=None, obj=None):

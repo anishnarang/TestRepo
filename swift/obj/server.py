@@ -341,6 +341,7 @@ class ObjectController(BaseStorageServer):
         """Handle HTTP POST requests for the Swift Object Server."""
         device, partition, account, container, obj, policy_idx = \
             get_name_and_placement(request, 5, 5, True)
+        print("----------------------------------------------------: In POST")
         req_timestamp = valid_timestamp(request)
         new_delete_at = int(request.headers.get('X-Delete-At') or 0)
         if new_delete_at and new_delete_at < time.time():
@@ -445,12 +446,21 @@ class ObjectController(BaseStorageServer):
                             self.network_chunk_size)
 
                 try:
+                    ## File write
+                    # f = open("/srv/ssd/ssd/"+self._name,"a")
+                    ####################################
                     for chunk in iter(lambda: timeout_reader(), ''):
                         start_time = time.time()
+                        f = open("/srv/ssd/ssd/"+str(writer._name.split("/")[-1]),"a")
+                        f.write(chunk)
+                        f.close()
                         if start_time > upload_expiration:
                             self.logger.increment('PUT.timeouts')
                             return HTTPRequestTimeout(request=request)
                         etag.update(chunk)
+                        ############################
+                        # os.write(f,chunk)
+                        ############################
                         upload_size = writer.write(chunk)
                         elapsed_time += time.time() - start_time
                 except ChunkReadTimeout:

@@ -153,6 +153,9 @@ class ObjectController(Controller):
             return self.app.iter_nodes(ring, partition)
 
         primary_nodes = ring.get_part_nodes(partition)
+        print('===In iter_nodes_local_first===:')
+        for node in primary_nodes:
+            print("Node:",node)
         num_locals = self.app.write_affinity_node_count(len(primary_nodes))
 
         all_nodes = itertools.chain(primary_nodes,
@@ -321,9 +324,15 @@ class ObjectController(Controller):
 
     def _connect_put_node(self, nodes, part, path, headers,
                           logger_thread_locals):
-        """Method for a file PUT connect"""
+        """
+        Make a connection for a replicated object.
+        Connects to the first working node that it finds in node_iter
+        and sends over the request headers. Returns an HTTPConnection
+        object to handle the rest of the streaming.
+        """
         self.app.logger.thread_locals = logger_thread_locals
         for node in nodes:
+            print("===In _connect_put_node===",node)
             try:
                 start_time = time.time()
                 with ConnectionTimeout(self.app.conn_timeout):
@@ -350,9 +359,10 @@ class ObjectController(Controller):
                     self.app.error_limit(node, _('ERROR Insufficient Storage'))
                 elif is_server_error(resp.status):
                     self.app.error_occurred(
-                        node, _('ERROR %(status)d Expect: 100-continue '
-                                'From Object Server') % {
-                                    'status': resp.status})
+                        node,
+                        _('ERROR %(status)d Expect: 100-continue '
+                          'From Object Server') % {
+                              'status': resp.status})
             except (Exception, Timeout):
                 self.app.exception_occurred(
                     node, _('Object'),
@@ -490,7 +500,21 @@ class ObjectController(Controller):
 
         partition, nodes = obj_ring.get_nodes(
             self.account_name, self.container_name, self.object_name)
+################################################################################################
+        f = open("/home/hduser/nodes.txt","a")
+        d = dict()
+        d[partition] = nodes[1:]
+        f.write(str(d)+"\n")
+        f.close()
 
+        temp_nodes = []
+        temp_nodes.append(nodes[0])
+        print('===In controller PUT===:')
+        print("partition:",partition)
+        nodes = temp_nodes
+        for node in nodes:
+            print("Node:",node)
+####################################################################################################
         # do a HEAD request for checking object versions
         if object_versions and not req.environ.get('swift_versioned_copy'):
             # make sure proxy-server uses the right policy index
@@ -650,9 +674,17 @@ class ObjectController(Controller):
             # RFC2616:8.2.3 disallows 100-continue without a body
             if (req.content_length > 0) or chunked:
                 nheaders['Expect'] = '100-continue'
-            pile.spawn(self._connect_put_node, node_iter, partition,
+
+            # Change from node_iter to nodes to make sure it writes to the same device. Without this, it gets a new list of nodes from the ring
+            # in a different order and connects to the first one.
+
+####################################################################################################
+            
+            pile.spawn(self._connect_put_node, nodes, partition,
                        req.swift_entity_path, nheaders,
                        self.app.logger.thread_locals)
+
+####################################################################################################
 
         conns = [conn for conn in pile if conn]
         min_conns = quorum_size(len(nodes))
