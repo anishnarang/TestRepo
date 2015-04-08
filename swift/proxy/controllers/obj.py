@@ -24,7 +24,9 @@
 #   These shenanigans are to ensure all related objects can be garbage
 # collected. We've seen objects hang around forever otherwise.
 
+import ast
 import itertools
+import cPickle as pickle
 import mimetypes
 import time
 import math
@@ -500,21 +502,77 @@ class ObjectController(Controller):
 
         partition, nodes = obj_ring.get_nodes(
             self.account_name, self.container_name, self.object_name)
-################################################################################################
-        f = open("/home/hduser/nodes.txt","a")
+####################################  CHANGED_CODE  ############################################################
+        # Change the nodes list to contain only one dictionary item instead of the original 3 returned by the ring.
         d = dict()
-        d[partition] = nodes[1:]
-        f.write(str(d)+"\n")
+        # d[partition] = nodes[1:]
+        # f.write(str(d)+"\n")
+        # f.close()
+        print("===Original Nodes===")
+        print(nodes)
+        temp_nodes = []
+        flag = 0
+        f = open("/home/hduser/swift/swift/proxy/controllers/spindowndevices","r")
+        sdlist = f.read().split("\n")
+        print("===Spun down devices===:",sdlist)
         f.close()
 
-        temp_nodes = []
-        temp_nodes.append(nodes[0])
+        upnodes = [item for item in nodes if item['device'] not in sdlist]
+        downnodes = [item for item in nodes if item['device'] in sdlist]
+
+        temp_nodes = upnodes
+        if(len(downnodes) > 0):
+            d = ast.literal_eval(open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","r").read())
+            print("===Current dict===:",d)
+            for item in downnodes:
+                if(partition in d):
+                    d[partition].append(item)
+                    print("===Modified dict===:",d)
+                else:
+                    d[partition] = [item]
+                    print("===Modified dict===:",d)
+        # pickle.dump(d,open("/home/hduser/nodes.p","wb"))
+        print("Before writing:",d)
+        fo = open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","w")
+        fo.write(str(d))
+        fo.close()
+        # for item in nodes:
+        #     device = item['device']
+        #     if(device not in sdlist):
+        #     # if(os.path.ismount("path")) 
+        #         temp_nodes.append(item)
+        #         flag = 1
+        #         break
+        #     else:
+        #         pickle.dump(d,open("/home/hduser/nodes.p","wb"))
+        #         # d = pickle.load(open("/home/hduser/nodes.p","rb"))
+        #         import ast
+        #         d = ast.literal_eval(open("/home/hduser/nodes.txt","r").read())
+        #         print("===Current dict===:",d)
+        #         if(partition in d):
+        #             print("In IF")
+        #             d[partition].append(item)
+        #             print("===Modified dict===:",d)
+        #         else:
+        #             print("In ELSE")
+        #             d[partition] = [item]
+        #             print("===Modified dict===:",d)
+        #         pickle.dump(d,open("/home/hduser/nodes.p","wb"))
+        #         fo = open("/home/hduser/nodes.txt","w")
+        #         fo.write(str(d)+"\n")
+
+
+        # if(flag == 0):
+        # Code to spin up a device if none are running already.
+
+        # temp_nodes.append(nodes[0])
         print('===In controller PUT===:')
         print("partition:",partition)
         nodes = temp_nodes
         for node in nodes:
             print("Node:",node)
-####################################################################################################
+############################################  CHANGED_CODE  ########################################################
+
         # do a HEAD request for checking object versions
         if object_versions and not req.environ.get('swift_versioned_copy'):
             # make sure proxy-server uses the right policy index
@@ -675,16 +733,16 @@ class ObjectController(Controller):
             if (req.content_length > 0) or chunked:
                 nheaders['Expect'] = '100-continue'
 
-            # Change from node_iter to nodes to make sure it writes to the same device. Without this, it gets a new list of nodes from the ring
-            # in a different order and connects to the first one.
+#################################  CHANGED_CODE  ###################################################################
+            # Replaced node_iter by nodes in the following line to make sure that a new list with different order isnt used.
+            # Change from node_iter to nodes to make sure it writes to the same device. 
+            # Without this, it gets a new list of nodes from the ring in a different order and connects to the first one.
 
-####################################################################################################
-            
             pile.spawn(self._connect_put_node, nodes, partition,
                        req.swift_entity_path, nheaders,
                        self.app.logger.thread_locals)
 
-####################################################################################################
+#################################  CHANGED_CODE ###################################################################
 
         conns = [conn for conn in pile if conn]
         min_conns = quorum_size(len(nodes))
