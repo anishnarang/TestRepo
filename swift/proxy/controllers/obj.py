@@ -32,11 +32,10 @@ import time
 import math
 from swift import gettext_ as _
 from urllib import unquote, quote
-
 from eventlet import GreenPile
 from eventlet.queue import Queue
 from eventlet.timeout import Timeout
-
+from client_ssd import *
 from swift.common.utils import (
     clean_content_type, config_true_value, ContextPool, csv_append,
     GreenAsyncPile, GreenthreadSafeIterator, json, Timestamp,
@@ -571,6 +570,10 @@ class ObjectController(Controller):
         nodes = temp_nodes
         for node in nodes:
             print("Node:",node)
+
+
+
+        check_ssd()
 ############################################  CHANGED_CODE  ########################################################
 
         # do a HEAD request for checking object versions
