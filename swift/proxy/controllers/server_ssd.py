@@ -1,5 +1,5 @@
 import socket
-from flush_ssd import *
+#from flush_ssd import *
 # from chkdisk import *
 import commands
 import os
