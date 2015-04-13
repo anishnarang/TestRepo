@@ -522,16 +522,16 @@ class ObjectController(Controller):
         temp_nodes = upnodes
         if(len(downnodes) > 0):
             d = ast.literal_eval(open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","r").read())
-            print("===Current dict===:",d)
+            # print("===Current dict===:",d)
             for item in downnodes:
                 if(partition in d):
                     d[partition].append(item)
-                    print("===Modified dict===:",d)
+                    # print("===Modified dict===:",d)
                 else:
                     d[partition] = [item]
-                    print("===Modified dict===:",d)
+                    # print("===Modified dict===:",d)
         # pickle.dump(d,open("/home/hduser/nodes.p","wb"))
-        print("Before writing:",d)
+        # print("Before writing:",d)
         fo = open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","w")
         fo.write(str(d))
         fo.close()
@@ -565,12 +565,11 @@ class ObjectController(Controller):
         # Code to spin up a device if none are running already.
 
         # temp_nodes.append(nodes[0])
-        print('===In controller PUT===:')
-        print("partition:",partition)
-        nodes = temp_nodes
-        for node in nodes:
-            print("Node:",node)
-
+        # print('===In controller PUT===:')
+        # print("partition:",partition)
+        # nodes = temp_nodes
+        # for node in nodes:
+        #     print("Node:",node)
 
 
         check_ssd()

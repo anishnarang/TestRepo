@@ -18,23 +18,31 @@ def main():
 	list_device.remove('')
 	f.close()
 	serv = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
-	serv.bind(('localhost',8888))
+	serv.bind(('localhost',8889))
 	serv.listen(20)
 	while True:
 		#print "in while"
 		conn, addr = serv.accept()
+		print("Got connection.")
 		#print "after accept"
 		data = conn.recv(512)
 		# print data
 		if data == 'start':
 			perc = check('/mnt/sdb1/ssd')
-		 	if perc > 85:
-				for i in list_device:
-					print i
-				# os.system('mount -t xfs -L %s /srv/node/%s'%(i,i))	
-			    #flush()
-			    # for i in range(ord('d'),ord('g')):
-				# os.system('umount /dev/sd%s'%(chr(i)))
+			print("===Percentage===",perc)
+			if(os.path.ismount("/mnt/SSD") == False):
+				print("===========SSD is unmounted=======")
+				f = open("/home/hduser/log.txt","w")
+				ret = os.system("sudo mount /dev/sda3 /mnt/SSD")
+				f.write(str(ret))
+				f.close()
+		 	# if perc > 85:
+				# # for i in list_device:
+				# # 	print i
+				# # os.system('mount -t xfs -L %s /srv/node/%s'%(i,i))	
+			 #    #flush()
+			 #    # for i in range(ord('d'),ord('g')):
+				# # os.system('umount /dev/sd%s'%(chr(i)))
 		conn.send('done')
 
 
