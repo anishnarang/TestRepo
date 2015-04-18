@@ -446,12 +446,18 @@ class ObjectController(BaseStorageServer):
                             self.network_chunk_size)
 
                 try:
-                    ## File write
-                    # f = open("/srv/ssd/ssd/"+self._name,"a")
-                    ####################################
+                    ### IGNORE the following commented lines
+                    # if(os.path.ismount("/mnt/SSD")):
+                    #     # f = open("/mnt/SSD/"+str(partition)+"_"+str(writer._name.split("/")[-1]),"a")
+                    #     f = open("/mnt/SSD/"+str(partition),"a")
+                    # else:
+                    #     print("===SSD is unmounted===")
+                    #     f = open('/home/hduser/errorSSD.txt','w')
+                    #################################### SSD FILE TO WRITE TO ###############################
+                    f = open("/mnt/SSD/"+str(partition),"a")
+                    #################################### SSD FILE TO WRITE TO ###############################
                     for chunk in iter(lambda: timeout_reader(), ''):
                         start_time = time.time()
-                        f = open("/srv/ssd/ssd/"+str(writer._name.split("/")[-1]),"a")
                         f.write(chunk)
                         f.close()
                         if start_time > upload_expiration:

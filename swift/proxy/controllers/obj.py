@@ -456,6 +456,13 @@ class ObjectController(Controller):
     @delay_denial
     def PUT(self, req):
         """HTTP PUT request handler."""
+
+####################################  CHANGED_CODE  ############################################################
+        # Just to see how many times this method was called while it was giving errors.
+        f = open("/home/hduser/methodcount.txt","a")
+        f.write("Called")
+        f.close()
+####################################  CHANGED_CODE  ############################################################
         if req.if_none_match is not None and '*' not in req.if_none_match:
             # Sending an etag with if-none-match isn't currently supported
             return HTTPBadRequest(request=req, content_type='text/plain',
@@ -518,23 +525,24 @@ class ObjectController(Controller):
 
         upnodes = [item for item in nodes if item['device'] not in sdlist]
         downnodes = [item for item in nodes if item['device'] in sdlist]
-
         temp_nodes = upnodes
         if(len(downnodes) > 0):
             d = ast.literal_eval(open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","r").read())
-            print("===Current dict===:",d)
+            # print("===Current dict===:",d)
             for item in downnodes:
                 if(partition in d):
                     d[partition].append(item)
-                    print("===Modified dict===:",d)
+                    # print("===Modified dict===:",d)
                 else:
                     d[partition] = [item]
-                    print("===Modified dict===:",d)
+                    # print("===Modified dict===:",d)
         # pickle.dump(d,open("/home/hduser/nodes.p","wb"))
-        print("Before writing:",d)
+        # print("Before writing:",d)
         fo = open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","w")
-        fo.write(str(d))
+        fo.write(str(d)+"\n")
         fo.close()
+
+        ## Old method, IGNORE
         # for item in nodes:
         #     device = item['device']
         #     if(device not in sdlist):
@@ -564,14 +572,11 @@ class ObjectController(Controller):
         # if(flag == 0):
         # Code to spin up a device if none are running already.
 
-        # temp_nodes.append(nodes[0])
+        temp_nodes.append(nodes[0])
         print('===In controller PUT===:')
-        print("partition:",partition)
+        print("===Partition===",partition)
         nodes = temp_nodes
-        for node in nodes:
-            print("Node:",node)
-
-
+        print("===Nodes===:",nodes)
 
         check_ssd()
 ############################################  CHANGED_CODE  ########################################################
