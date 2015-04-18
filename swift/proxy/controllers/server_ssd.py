@@ -1,4 +1,9 @@
 import socket
+<<<<<<< HEAD
+=======
+#from flush_ssd import *
+# from chkdisk import *
+>>>>>>> 4ca844a32b7e9399e1bc669e4f3662cb3f8dd7af
 import commands
 import os
 import ast
@@ -115,10 +120,20 @@ def main():
 		# print data
 		if data == 'start':
 			perc = check('/mnt/sdb1/ssd')
+<<<<<<< HEAD
 			print("===SSD Percentage===",perc)
 			## Call flush if SSD is full
 			flush()
 
+=======
+			print("===Percentage===",perc)
+			if(os.path.ismount("/mnt/SSD") == False):
+				print("===========SSD is unmounted=======")
+				f = open("/home/hduser/log.txt","w")
+				ret = os.system("sudo mount /dev/sda3 /mnt/SSD")
+				f.write(str(ret))
+				f.close()
+>>>>>>> 4ca844a32b7e9399e1bc669e4f3662cb3f8dd7af
 		 	# if perc > 85:
 				# # for i in list_device:
 				# # 	print i

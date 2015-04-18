@@ -572,11 +572,21 @@ class ObjectController(Controller):
         # if(flag == 0):
         # Code to spin up a device if none are running already.
 
+<<<<<<< HEAD
         temp_nodes.append(nodes[0])
         print('===In controller PUT===:')
         print("===Partition===",partition)
         nodes = temp_nodes
         print("===Nodes===:",nodes)
+=======
+        # temp_nodes.append(nodes[0])
+        # print('===In controller PUT===:')
+        # print("partition:",partition)
+        # nodes = temp_nodes
+        # for node in nodes:
+        #     print("Node:",node)
+
+>>>>>>> 4ca844a32b7e9399e1bc669e4f3662cb3f8dd7af
 
         check_ssd()
 ############################################  CHANGED_CODE  ########################################################

@@ -446,6 +446,7 @@ class ObjectController(BaseStorageServer):
                             self.network_chunk_size)
 
                 try:
+<<<<<<< HEAD
                     ### IGNORE the following commented lines
                     # if(os.path.ismount("/mnt/SSD")):
                     #     # f = open("/mnt/SSD/"+str(partition)+"_"+str(writer._name.split("/")[-1]),"a")
@@ -456,6 +457,18 @@ class ObjectController(BaseStorageServer):
                     #################################### SSD FILE TO WRITE TO ###############################
                     f = open("/mnt/SSD/"+str(partition),"a")
                     #################################### SSD FILE TO WRITE TO ###############################
+=======
+                    # if(os.path.ismount("/mnt/SSD") == False):
+                    #     print("===========SSD is unmounted=======")
+                    #     f = open("/home/hduser/log.txt","w")
+                    #     ret = os.system("sudo mount /dev/sda3 /mnt/SSD")
+                    #     f.write(str(ret))
+                    #     f.close()
+                    f = open("/mnt/SSD/"+str(writer._name.split("/")[-1]),"a")
+                    ## File write
+                    # f = open("/srv/ssd/ssd/"+self._name,"a")
+                    ####################################
+>>>>>>> 4ca844a32b7e9399e1bc669e4f3662cb3f8dd7af
                     for chunk in iter(lambda: timeout_reader(), ''):
                         start_time = time.time()
                         f.write(chunk)
