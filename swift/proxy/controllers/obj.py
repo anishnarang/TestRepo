@@ -528,6 +528,7 @@ class ObjectController(Controller):
         temp_nodes = upnodes
         if(len(downnodes) > 0):
             d = ast.literal_eval(open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","r").read())
+            d_temp=pickle.load("/home/hduser/swift/proxy/controllers/nodes.p","rb")
             # print("===Current dict===:",d)
             for item in downnodes:
                 if(partition in d):
@@ -541,7 +542,7 @@ class ObjectController(Controller):
         fo = open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","w")
         fo.write(str(d)+"\n")
         fo.close()
-
+        pickle.dump(d,open("/home/hduser/swift/swift/proxy/controllers/nodes.p","wb"))
         ## Old method, IGNORE
         # for item in nodes:
         #     device = item['device']
