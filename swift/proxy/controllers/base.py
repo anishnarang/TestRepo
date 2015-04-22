@@ -872,7 +872,7 @@ class GetOrHeadHandler(object):
             print("===Reading from SSD====")
             res = Response(request=req)
             res.app_iter = self.myread(self.app.object_chunk_size,self.partition)
-        elif(self.server_type!='Object'):   
+        else:   
             print("===Reading from node===")
             print("===Node chosen to download===",node)
             if source:
