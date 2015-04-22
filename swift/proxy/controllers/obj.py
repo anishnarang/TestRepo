@@ -191,6 +191,7 @@ class ObjectController(Controller):
                 return aresp
         partition = obj_ring.get_part(
             self.account_name, self.container_name, self.object_name)
+
         resp = self.GETorHEAD_base(
             req, _('Object'), obj_ring, partition,
             req.swift_entity_path)

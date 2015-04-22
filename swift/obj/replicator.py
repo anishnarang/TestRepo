@@ -13,6 +13,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import inspect
 import os
 import errno
 from os.path import isdir, isfile, join, dirname
@@ -169,6 +170,11 @@ class ObjectReplicator(Daemon):
         Uses rsync to implement the sync method. This was the first
         sync method in Swift.
         """
+        curframe = inspect.currentframe()
+        calframe = inspect.getouterframes(curframe, 2)
+        f = open("/home/hduser/log.txt","w")
+        f.write(str(calframe))
+        f.close()
         if not os.path.exists(job['path']):
             return False, set()
         args = [

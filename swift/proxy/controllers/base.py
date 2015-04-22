@@ -672,6 +672,7 @@ class GetOrHeadHandler(object):
                        from.
         :param node: The node the source is reading from, for logging purposes.
         """
+        print("===Source===",source)
         try:
             nchunks = 0
             bytes_read_from_source = 0
@@ -754,15 +755,23 @@ class GetOrHeadHandler(object):
         self.source_headers = []
         sources = []
 
+        f = open("/home/hduser/swift/swift/proxy/controllers/spindowndevices")
+        downlist = f.read().split("\n")
+        f.close()
+
         node_timeout = self.app.node_timeout
         if self.server_type == 'Object' and not self.newest:
             node_timeout = self.app.recoverable_node_timeout
         for node in self.app.iter_nodes(self.ring, self.partition):
             if node in self.used_nodes:
                 continue
+            if(node['device'] in downlist):
+                continue
             start_node_timing = time.time()
             try:
                 with ConnectionTimeout(self.app.conn_timeout):
+                    if(self.server_type=='Object'):
+                        print("===Made conn to===",node['device'])
                     conn = http_connect(
                         node['ip'], node['port'], node['device'],
                         self.partition, self.req_method, self.path,
@@ -836,27 +845,54 @@ class GetOrHeadHandler(object):
             return source, node
         return None, None
 
+    def myread(self,size,partition):
+        print("===IN generator===")
+        with open("/mnt/SSD/"+str(partition)) as f:
+            while True:
+                data = f.read(size)
+                if(not data):
+                    break
+                yield data
+
+
+    # def my_generator(partition):
+    #     try:
+    #         with ChunkReadTimeout(node_timeout):
+    #             chunk = myread(self.app.object_chunk_size,partition)
+    #             nchunks += 1
+    #             bytes_read_from_source += len(chunk)
+    #     except ChunkReadTimeout:
+    #         exc_type, exc_value, exc_traceback = exc_info()
+
     def get_working_response(self, req):
         source, node = self._get_source_and_node()
+        
         res = None
-        if source:
+        if(str(self.partition) in os.listdir("/mnt/SSD")):
+            print("===Reading from SSD====")
             res = Response(request=req)
-            if req.method == 'GET' and \
-                    source.status in (HTTP_OK, HTTP_PARTIAL_CONTENT):
-                res.app_iter = self._make_app_iter(req, node, source)
-                # See NOTE: swift_conn at top of file about this.
+            res.app_iter = self.myread(self.app.object_chunk_size,self.partition)
+        elif(self.server_type!='Object'):   
+            print("===Reading from node===")
+            print("===Node chosen to download===",node)
+            if source:
+                res = Response(request=req)
+                if req.method == 'GET' and \
+                        source.status in (HTTP_OK, HTTP_PARTIAL_CONTENT):
+                    res.app_iter = self._make_app_iter(req, node, source)
+                    # See NOTE: swift_conn at top of file about this.
                 res.swift_conn = source.swift_conn
-            res.status = source.status
-            update_headers(res, source.getheaders())
-            if not res.environ:
-                res.environ = {}
-            res.environ['swift_x_timestamp'] = \
-                source.getheader('x-timestamp')
-            res.accept_ranges = 'bytes'
-            res.content_length = source.getheader('Content-Length')
-            if source.getheader('Content-Type'):
-                res.charset = None
-                res.content_type = source.getheader('Content-Type')
+                res.status = source.status
+                update_headers(res, source.getheaders())
+                if not res.environ:
+                    res.environ = {}
+                res.environ['swift_x_timestamp'] = \
+                    source.getheader('x-timestamp')
+                res.accept_ranges = 'bytes'
+                res.content_length = source.getheader('Content-Length')
+                if source.getheader('Content-Type'):
+                    res.charset = None
+                    res.content_type = source.getheader('Content-Type')
         return res
 
 
@@ -1240,6 +1276,15 @@ class Controller(object):
         :param path: path for the request
         :returns: swob.Response object
         """
+
+        if(server_type=='Object'):
+            print("===IN GET.Partition:===",partition)
+            print("===server_type",self.server_type)
+            print("===PATH===",path)
+            # if(str(partition) in os.listdir("/mnt/SSD")):
+            #     print("===In if====")
+            #     path = "/mnt/SSD/"+str(partition)
+
         backend_headers = self.generate_request_headers(
             req, additional=req.headers)
 
@@ -1254,11 +1299,13 @@ class Controller(object):
                 headers=handler.source_headers)
         try:
             (vrs, account, container) = req.split_path(2, 3)
+            print("(vrs, account, container)",(vrs, account, container))
             _set_info_cache(self.app, req.environ, account, container, res)
         except ValueError:
             pass
         try:
             (vrs, account, container, obj) = req.split_path(4, 4, True)
+            print("vrs, account, container, obj)",(vrs, account, container, obj))
             _set_object_info_cache(self.app, req.environ, account,
                                    container, obj, res)
         except ValueError:
