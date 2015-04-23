@@ -454,7 +454,7 @@ class ObjectController(BaseStorageServer):
                     #     print("===SSD is unmounted===")
                     #     f = open('/home/hduser/errorSSD.txt','w')
                     #################################### SSD FILE TO WRITE TO ###############################
-                    f = open("/mnt/SSD/"+str(partition),"a")
+                    f = open("/SSD/"+str(partition),"a")
                     #################################### SSD FILE TO WRITE TO ###############################
                     for chunk in iter(lambda: timeout_reader(), ''):
                         start_time = time.time()
