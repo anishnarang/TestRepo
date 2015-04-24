@@ -847,7 +847,7 @@ class GetOrHeadHandler(object):
 
     def myread(self,size,partition):
         print("===IN generator===")
-        with open("/mnt/SSD/"+str(partition)) as f:
+        with open("/SSD/"+str(partition)) as f:
             while True:
                 data = f.read(size)
                 if(not data):
@@ -868,7 +868,7 @@ class GetOrHeadHandler(object):
         source, node = self._get_source_and_node()
         
         res = None
-        if(str(self.partition) in os.listdir("/mnt/SSD")):
+        if(str(self.partition) in os.listdir("/SSD")):
             print("===Reading from SSD====")
             res = Response(request=req)
             res.app_iter = self.myread(self.app.object_chunk_size,self.partition)

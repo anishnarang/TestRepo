@@ -504,8 +504,17 @@ class ObjectReplicator(Daemon):
                 try:
                     job_path = join(obj_path, partition)
                     part_nodes = obj_ring.get_part_nodes(int(partition))
+
+######################################  CHANGED_CODE  ########################################################
+                    f = open("/home/hduser/swift/swift/proxy/controllers/spindowndevices")
+                    downlist = f.read.split("\n")
+                    f.close()
+
                     nodes = [node for node in part_nodes
-                             if node['id'] != local_dev['id']]
+                             if node['id'] != local_dev['id'] and node['dev'] not in downlist]
+
+######################################  CHANGED_CODE  ########################################################
+
                     jobs.append(
                         dict(path=job_path,
                              device=local_dev['device'],
@@ -617,6 +626,10 @@ class ObjectReplicator(Daemon):
             override_partitions = None
         if not override_policies:
             override_policies = None
+######################################  CHANGED_CODE  ########################################################
+
+        override_devices = ['sda4']
+######################################  CHANGED_CODE  ########################################################
 
         self.replicate(
             override_devices=override_devices,

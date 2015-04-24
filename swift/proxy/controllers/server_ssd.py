@@ -16,9 +16,11 @@ from swift.common.utils import rsync_ip
 
 def check(s):
 	cmd = "df -h "+s
+	print(cmd)
 	output = commands.getoutput(cmd)
 	output=output.split()
 	#x=os.system("df -h /media/hduser/UUI/")
+	print(output)
 	x=output[11].strip("%")
 	return int(x)
 
@@ -32,7 +34,7 @@ def del_dict():
 def rsync(partition, device):
 	node_ip = rsync_ip('127.0.0.1')
 	rsync_module = '%s::object' %(node_ip)
-	spath = join('/mnt/SSD/%s' %partition)
+	spath = join('/SSD/%s' %partition)
 	args = [
             'rsync',
             '--recursive',
@@ -82,7 +84,7 @@ def rsync(partition, device):
 def flush():
 	# dict_info = pickle.load(open('/usr/bin/device.p','rb'))
 	dict_info = ast.literal_eval(open("/home/hduser/swift/swift/proxy/controllers/nodes.txt","r").read())
-	files = [f for f in listdir('/mnt/SSD')] 
+	files = [f for f in listdir('/SSD')] 
 	for f in files:
 		print("===FILE in SSD===",f)
 		deviceList = dict_info[int(f)]
@@ -116,10 +118,10 @@ def main():
 		data = conn.recv(512)
 		# print data
 		if data == 'start':
-			perc = check('/mnt/sdb1/ssd')
+			perc = check('/SSD/')
 			print("===SSD Percentage===",perc)
 			## Call flush if SSD is full
-			flush()
+			# flush()
 
 		 	# if perc > 85:
 				# # for i in list_device:

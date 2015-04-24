@@ -457,13 +457,6 @@ class ObjectController(Controller):
     @delay_denial
     def PUT(self, req):
         """HTTP PUT request handler."""
-
-####################################  CHANGED_CODE  ############################################################
-        # Just to see how many times this method was called while it was giving errors.
-        f = open("/home/hduser/methodcount.txt","a")
-        f.write("Called")
-        f.close()
-####################################  CHANGED_CODE  ############################################################
         if req.if_none_match is not None and '*' not in req.if_none_match:
             # Sending an etag with if-none-match isn't currently supported
             return HTTPBadRequest(request=req, content_type='text/plain',
