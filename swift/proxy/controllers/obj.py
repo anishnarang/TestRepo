@@ -564,8 +564,16 @@ class ObjectController(Controller):
         #         fo.write(str(d)+"\n")
 
 
-        # if(flag == 0):
         # Code to spin up a device if none are running already.
+        if(len(upnodes) == 0):
+            dev = nodes[0]['device']
+            print("===ALL NODES DOWN===")
+            print("===Mounting device===",dev)
+            os.system("mount /dev/"+str(dev))
+            
+         print('===In controller PUT===:')
+         print("===Partition===",partition)
+         nodes = temp_nodes
 
         print('===In controller PUT===:')
         print("===Partition===",partition)

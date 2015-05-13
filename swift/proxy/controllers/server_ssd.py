@@ -30,6 +30,14 @@ def del_dict():
 	f= {}
 	pickle.dump(f,open('/usr/bin/device.p','wb'))
 
+	f = open("nodes.txt","r")	# Must contain {} if empty
+	d = f.read()
+	d = "{}"
+	f.close()
+	f = open("nodes.txt","w")
+	f.write(str(d))
+	f.close()
+
 
 def rsync(partition, device):
 	node_ip = rsync_ip('127.0.0.1')
