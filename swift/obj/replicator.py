@@ -507,11 +507,12 @@ class ObjectReplicator(Daemon):
 
 ######################################  CHANGED_CODE  ########################################################
                     f = open("/home/hduser/swift/swift/proxy/controllers/spindowndevices")
-                    downlist = f.read.split("\n")
+                    downlist = f.read().split("\n")
                     f.close()
 
                     nodes = [node for node in part_nodes
-                             if node['id'] != local_dev['id'] and node['dev'] not in downlist]
+                             if node['id'] != local_dev['id'] and node['device'] not in downlist]
+                    print("===Replication nodes===",nodes)
 
 ######################################  CHANGED_CODE  ########################################################
 
