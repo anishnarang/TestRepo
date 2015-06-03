@@ -571,9 +571,9 @@ class ObjectController(Controller):
             print("===Mounting device===",dev)
             os.system("mount /dev/"+str(dev))
             
-         print('===In controller PUT===:')
-         print("===Partition===",partition)
-         nodes = temp_nodes
+        print('===In controller PUT===:')
+        print("===Partition===",partition)
+        nodes = temp_nodes
 
         print('===In controller PUT===:')
         print("===Partition===",partition)
